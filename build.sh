@@ -1,2 +1,4 @@
-echo "Hello World: trying to push info to jenkins, again, and again"
+echo "Running python test";
+cd python-test &&
+python -m unittest discover
 
