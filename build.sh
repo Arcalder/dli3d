@@ -1,4 +1,3 @@
 echo "Running python test";
-cd python-test &&
-python -m unittest discover
+python -m unittest discover -s tests -p '*_test.py';
 
