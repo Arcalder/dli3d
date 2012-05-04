@@ -1,0 +1,2 @@
+def giveMeSomething():
+    return ""
