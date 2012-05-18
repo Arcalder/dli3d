@@ -1,12 +1,8 @@
 #-------------------------------------------------------------------------------
-# Name:        module1
-# Purpose:
-#
-# Author:      KamusDave
+# Name:        TestArduino
+# Author:      Eduardo & Alonso
 #
 # Created:     15-05-2012
-# Copyright:   (c) KamusDave 2012
-# Licence:     <your licence>
 #-------------------------------------------------------------------------------
 #!/usr/bin/env python
 
