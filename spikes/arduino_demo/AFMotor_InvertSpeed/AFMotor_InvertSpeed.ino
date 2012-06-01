@@ -12,7 +12,6 @@
 
 AF_Stepper motor1(200, 2);
 int SPEED = 50;
-String inString = "";
 
 // you can change these to DOUBLE or INTERLEAVE or MICROSTEP!
 void forwardstep() {  
@@ -39,22 +38,10 @@ void loop()
 
 void serialEvent() {
   while (Serial.available()) {
-    int inChar = Serial.read();
-    if (isDigit(inChar)) {
-      // convert the incoming byte to a char 
-      // and add it to the string:
-      inString += (char)inChar; 
-    }
-    // if you get a newline, print the string,
-    // then the string's value:
-    if (inChar == '\n') {
-      Serial.print("Value:");
-      Serial.println(inString.toInt());
-      Serial.print("String: ");
-      Serial.println(inString);
-      SPEED = inString.toInt();
-      stepper.setSpeed(SPEED);
-      inString = "";
-    }
+    // get the new byte:
+    char inChar = (char)Serial.read(); 
+    // add it to the inputString:
+    SPEED = (SPEED * (-1));
+    stepper.setSpeed(SPEED);
   }
 }
