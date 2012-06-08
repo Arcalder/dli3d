@@ -1,0 +1,14 @@
+Licencia GPL
+* Se puede copiar, regalar o vender a terceros el software, sin tener
+  la “obligación” de pagar por ello.
+* El software modificado no debe tener costo por la licencia.
+* Tiene que incluir el código fuente.
+* Un programa con licencia GPL que ha sido modificado automáticamente es publicado con licencia GPL.
+
+ojo: que una vez iniciado con GPL, no se puede privatizar( ni por el dueño)
+
+más info de licencias en 
+http://www.gnu.org/licenses/license-list.es.html#SoftwareLicenses
+
+Licencia LGPL
+LGPL es una licencia que es prácticamente igual a la GPL, pero permite que software‘s con esta licencia estén integrado en software’s privativos.
