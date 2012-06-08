@@ -20,7 +20,7 @@ class Application(QtGui.QWidget):
         self.openSTLButton = QtGui.QPushButton('Open STL')
         self.openSTLButton.clicked.connect(self.showOpenFile)
         
-        self.createAnimationButton = QtGui.QPushButton('Create Animation')
+        self.createAnimationButton = QtGui.QPushButton('Print')
         self.createAnimationButton.setEnabled(False)
 ##        createAnimationButton.clicked.connect(self.makeAnimation)
 
