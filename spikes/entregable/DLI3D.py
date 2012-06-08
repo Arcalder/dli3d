@@ -25,10 +25,11 @@ class Application(QtGui.QWidget):
 ##        createAnimationButton.clicked.connect(self.makeAnimation)
 
         welcome = QtGui.QLabel('<h1>Welcome</h1>', self)
+        self.printLabel = QtGui.QLabel('<h3>When you are ready press Print to start printing</h3>')
         grid = QtGui.QGridLayout()
         grid.setSpacing(10)
         grid.addWidget(QtGui.QLabel('<h3>Please, select the STL file you want to print</h3>'), 1,0)
-        grid.addWidget(QtGui.QLabel('<h3>When you are ready press Print to start printing</h3>'), 2,0)
+        grid.addWidget(self.printLabel, 2,0)
         grid.addWidget(self.openSTLButton, 1, 2)
         grid.addWidget(self.createAnimationButton, 2, 2)
         
@@ -43,7 +44,7 @@ class Application(QtGui.QWidget):
             openFile = open(fileName, 'r')
             ##createImages(openFile)
             self.createAnimationButton.setEnabled(True)
-                                                     
+            self.printLabel.setText('<h3>When you are ready press Print to start printing '  + fileName + '</h3>')                                        
     ##def createImages(self, file):
         ##insertar el codigo para crear las imagenes
     
