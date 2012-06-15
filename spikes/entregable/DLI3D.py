@@ -3,7 +3,7 @@
 
 import sys
 from PyQt4 import QtGui
-
+from slices import createSlices
 
 class Application(QtGui.QWidget):
     
@@ -17,6 +17,11 @@ class Application(QtGui.QWidget):
         self.resize(800, 600)
         self.center()
         
+        self.heightInput = QtGui.QLineEdit()
+        self.outputInput = QtGui.QLineEdit()
+        self.stepInput = QtGui.QLineEdit()
+        self.layerInput = QtGui.QLineEdit()
+        
         self.openSTLButton = QtGui.QPushButton('Open STL')
         self.openSTLButton.clicked.connect(self.showOpenFile)
         
@@ -28,6 +33,16 @@ class Application(QtGui.QWidget):
         self.printLabel = QtGui.QLabel('<h3>When you are ready press Print to start printing</h3>')
         grid = QtGui.QGridLayout()
         grid.setSpacing(10)
+        
+        grid.addWidget(QtGui.QLabel('<h2>Height</h2>'), 0 , 0)
+        grid.addWidget(self.heightInput, 0, 1)
+        grid.addWidget(QtGui.QLabel('<h2>Output Directory</h2>'), 1 , 0)
+        grid.addWidget(self.outputInput, 1, 1)
+        grid.addWidget(QtGui.QLabel('<h2>Step</h2>'), 1 , 0)
+        grid.addWidget(self.stepInput, 1, 1)
+        grid.addWidget(QtGui.QLabel('<h2>Layer Thickness</h2>'), 1 , 0)
+        grid.addWidget(self.layerInput, 1, 1)
+        
         grid.addWidget(QtGui.QLabel('<h3>Please, select the STL file you want to print</h3>'), 1,0)
         grid.addWidget(self.printLabel, 2,0)
         grid.addWidget(self.openSTLButton, 1, 2)
@@ -41,12 +56,11 @@ class Application(QtGui.QWidget):
         fileName = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 
                 '/home', self.tr("STL Files (*.stl)"))
         if fileName:
-            openFile = open(fileName, 'r')
-            ##createImages(openFile)
+            createImages(fileName)
             self.createAnimationButton.setEnabled(True)
             self.printLabel.setText('<h3>When you are ready press Print to start printing '  + fileName + '</h3>')                                        
-    ##def createImages(self, file):
-        ##insertar el codigo para crear las imagenes
+    def createImages(self, fileName):
+        createSlices(self.heightInput.text, self.outputInput.text, fileName, self.stepInput.text, self.layerInput.text)
     
 ##    def makeAnimation(self):
         ##insertar el codigo que crea la animación
