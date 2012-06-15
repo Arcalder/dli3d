@@ -2,10 +2,14 @@
 
 #include <AccelStepper.h>
 #include <AFMotor.h>
+#include <Servo.h> 
 
 AF_Stepper motor1(200, 2);
+Servo myservo;
+int pos = 0;
 int SPEED = 50;
 int STEP = 5;
+int MAXPOS = 180;
 String inString = "";
 String steps= "";
 
@@ -27,11 +31,28 @@ void setup()
   Serial.println("Stepper program!");
   stepper.setMaxSpeed(200.0);
   stepper.setAcceleration(100.0);
+  myservo.attach(9); 
+  myservo.write(pos);
 }
 
 void loop()
 {  
   
+}
+
+void open_valve(){
+for(pos = 0; pos < MAXPOS; pos += 1)  // goes from 0 degrees to 180 degrees 
+  {                                  // in steps of 1 degree 
+    myservo.write(pos);              // tell servo to go to position in variable 'pos' 
+    delay(1);                       // waits 15ms for the servo to reach the position 
+  } 
+}
+void close_valve(){
+  for(pos = MAXPOS; pos>=1; pos-=1)     // goes from 180 degrees to 0 degrees 
+  {                                
+    myservo.write(pos);              // tell servo to go to position in variable 'pos' 
+    delay(1);                       // waits 15ms for the servo to reach the position 
+  } 
 }
 
 void serialEvent() {
@@ -64,6 +85,16 @@ void serialEvent() {
     if (inChar == '-') {
       long POSITION = stepper.currentPosition()-STEP;
       stepper.runToNewPosition(POSITION);
+    }
+    if (inChar == 'o') {
+      if(!pos){
+        open_valve();
+      }
+    }
+    if (inChar == 'c') {
+      if(pos){
+        close_valve();
+      }
     }
   }
 }
