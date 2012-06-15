@@ -4,7 +4,6 @@
 #
 # Created:     15-05-2012
 #-------------------------------------------------------------------------------
-#!/usr/bin/env python
 
 import serial
 import threading
@@ -21,8 +20,8 @@ def listener():
             print str(Exception)
 
 def main():
-    t = threading.Thread(target=listener)
-    t.start()
+    #t = threading.Thread(target=listener)
+    #t.start()
     keyinput = -1
     while keyinput != 0:
         keyinput = raw_input()
