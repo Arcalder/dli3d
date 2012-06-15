@@ -2,92 +2,86 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import os
 from PyQt4 import QtGui
-sys.path.append(os.path.join(os.getcwd(), '..', 'lib'))
-from slices import *
+from PyQt4.Qt import QRect
+from PyQt4.QtGui import QWidget, QPainter, QApplication
+
+class SecondaryWindow(QWidget):
+    def __init__(self):
+        QWidget.__init__(self)
+        pDesktop = QApplication.desktop ();
+        RectScreen0 = pDesktop.screenGeometry (1);
+        # Se conecta a proyectores -> importa la relación de sus resoluciones.
+        self.setGeometry(QRect(RectScreen0.left(), RectScreen0.top(), RectScreen0.width(), RectScreen0.height())) # x, y, w, h
+
+    #TODO
+    # Que se desplieguen las imagenes
+    def paintEvent(self, e):
+        dc = QPainter(self)
+        dc.drawLine(0, 0, 500, 500)
+        dc.drawLine(500, 0, 0, 500)
 
 class Application(QtGui.QWidget):
     
     def __init__(self):
         super(Application, self).__init__()
         
-        self.initUI()
+        self.initUI(800, 600)
         
-    def initUI(self):               
+    def initUI(self, w, h):               
         
-        self.resize(800, 600)
+        self.resize(w, h)
         self.center()
         
-        self.heightInput = QtGui.QLineEdit()
-        self.stepInput = QtGui.QLineEdit()
-        self.layerInput = QtGui.QLineEdit()
-        
-        self.outputFileName = ''
-        self.outputButton = QtGui.QPushButton('Open Folder')
-        self.outputButton.clicked.connect(self.showOpenFileOutput)
-         
         self.openSTLButton = QtGui.QPushButton('Open STL')
         self.openSTLButton.clicked.connect(self.showOpenFile)
-        self.openSTLButton.setEnabled(False)
         
-        self.createAnimationButton = QtGui.QPushButton('Print')
-        self.createAnimationButton.setEnabled(False)
-##        createAnimationButton.clicked.connect(self.makeAnimation)
+        self.createAnimationButton = QtGui.QPushButton('Create Animation')
+        self.createAnimationButton.setEnabled(True) # TODO
+        self.createAnimationButton.clicked.connect(self.createImage)
 
-        #welcome = QtGui.QLabel('<h1>Welcome</h1>', self)
-        self.printLabel = QtGui.QLabel('When you are ready press Print to start printing')
-        
+        # Messages
+        path_message = ""
+        open_stl_message = "<h3>Please, select the STL file you want to print</h3>"
+        creating_message = "<h3>When you are ready press Print to start printing</h3>"
+
+        self.pathLabel = QtGui.QLabel(path_message)
+        self.openLabel = QtGui.QLabel(open_stl_message)
+        self.printLabel = QtGui.QLabel(creating_message)
+
+        # Layout
         grid = QtGui.QGridLayout()
         grid.setSpacing(10)
+
+        grid.addWidget(self.openLabel, 1, 0)
+        grid.addWidget(self.openSTLButton, 1, 2)
+
+        #grid.addWidget(self.pathLabel, 2, 0)
         
-        grid.addWidget(QtGui.QLabel('Height'), 0 , 0)
-        grid.addWidget(self.heightInput, 0, 2)
-        grid.addWidget(QtGui.QLabel('Step'), 1 , 0)
-        grid.addWidget(self.stepInput, 1, 2)
-        grid.addWidget(QtGui.QLabel('Layer Thickness'), 2 , 0)
-        grid.addWidget(self.layerInput, 2, 2)
-        grid.addWidget(QtGui.QLabel('Output Directory'), 3 , 0)
-        grid.addWidget(self.outputButton, 3, 2)
-        
-        grid.addWidget(QtGui.QLabel('Please, select the STL file you want to print'), 4,0)
-        grid.addWidget(self.printLabel, 5,0)
-        grid.addWidget(QtGui.QLabel(''), 4 , 1)
-        grid.addWidget(self.openSTLButton, 4, 2)
-        grid.addWidget(self.createAnimationButton, 5, 2)
-        
+        grid.addWidget(self.printLabel, 2, 0)
+        grid.addWidget(self.createAnimationButton, 2, 2)
+
         self.setLayout(grid)
         self.setWindowTitle('DLI3D')    
         self.show()
         
-    def createImages(self,fileName):
-        createSlices(self.heightInput.text, str(self.outputFileName), str(fileName), self.stepInput.text, self.layerInput.text)
-    
     def showOpenFile(self):
-        fileName = QtGui.QFileDialog.getOpenFileName(self, 'Open file', 
-                '/home', self.tr("STL Files (*.stl)"))
+        fileName = QtGui.QFileDialog.getOpenFileName(self, 'Open file', '/home', self.tr("STL Files (*.stl)"))
         if fileName:
-            self.createImages(fileName)
+            openFile = open(fileName, 'r')
+            ##createImages(openFile)
             self.createAnimationButton.setEnabled(True)
-            self.printLabel.setText('When you are ready press Print to start printing '  + fileName)    
-    
-    def showOpenFileOutput(self):
-        fileName = QtGui.QFileDialog.getExistingDirectory(self, 'Open file', 
-                '/home')
-        if fileName:
-        	  self.outputFileName = fileName
-        	  if self.heightInput.text and self.stepInput.text and self.layerInput.text:
-        	  	self.openSTLButton.setEnabled(True)                         
-    
-##    def makeAnimation(self):
-        ##insertar el codigo que crea la animación
+            self.pathLabel.setText('<h3>'+ fileName +'</h3>')                      
+
+    def createImage(self):
+        self.w = SecondaryWindow()
+        self.w.show()
+
     def center(self):
-        
         qr = self.frameGeometry()
         cp = QtGui.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
-        
         
 def main():
     
