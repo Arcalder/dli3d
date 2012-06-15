@@ -56,10 +56,10 @@ class Application(QtGui.QWidget):
         grid.addWidget(self.openLabel, 1, 0)
         grid.addWidget(self.openSTLButton, 1, 2)
 
-        grid.addWidget(self.pathLabel, 2, 0)
+        #grid.addWidget(self.pathLabel, 2, 0)
         
-        grid.addWidget(self.printLabel, 3, 0)
-        grid.addWidget(self.createAnimationButton, 3, 2)
+        grid.addWidget(self.printLabel, 2, 0)
+        grid.addWidget(self.createAnimationButton, 2, 2)
 
         self.setLayout(grid)
         self.setWindowTitle('DLI3D')    
