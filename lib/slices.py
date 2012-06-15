@@ -2,7 +2,8 @@ import os
 import subprocess
 
 def createSlices(height,output,path,step,layer_thickness):
-	os.system("slice "+path+" -z0,"+str(height)+","+str(step)+" -l "+str(layer_thickness)+" -o "+output)
+    os.chdir(output)
+    os.system("slice "+path+" -z0,"+str(height)+","+str(step)+" -l "+str(layer_thickness)+" -o "+output+".jpg")
 
 
 #height = raw_input("Enter height: ")
