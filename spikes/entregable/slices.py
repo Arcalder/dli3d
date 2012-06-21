@@ -8,21 +8,22 @@ def createSlices(height,output,path,step,layer_thickness):
 	#print path
 	#step=0.5
 	#layer_thickness=10
-	print height
-	print output
-	print path
-	print step
-	print layer_thickness
+	#print height
+	#print output
+	#print path
+	#print step
+	#print layer_thickness
 	dir=output[:(-len(output)+output.find('.'))]
 	new_output= output[len(output)-(output[::-1]).find('\\'):]
-	print new_output
-	print dir
+	#print new_output
+	#print dir
 	if not (os.path.exists(dir)):
 		os.mkdir(dir)
-	print 'Antes del chdir'+os.getcwd()
+	#print 'Antes del chdir'+os.getcwd()
 	os.chdir(dir)
-	print 'Despues del chdir'+os.getcwd()
+	#print 'Despues del chdir'+os.getcwd()
 	#os.system("slice "+path+" -z0,"+str(height)+",0.5 -o "+output)
+	#print "slice "+path+" -z0,"+str(height)+","+str(step)+" -l "+str(layer_thickness)+" -o "+new_output
 	os.system("slice "+path+" -z0,"+str(height)+","+str(step)+" -l "+str(layer_thickness)+" -o "+new_output)
 
 
