@@ -6,6 +6,6 @@ def giveMeSomething():
     return ""
 
 
-def methodWithNotImplementedClass():
-    bird = NotImplementedClass()
-    bird.notImplementedMethod()
+def methodWithNotImplementedClass(value):
+    NotImplementedClass.notImplementedMethod(value)
+    return False

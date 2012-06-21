@@ -22,10 +22,12 @@ class TestExample(unittest.TestCase):
         self.assertTrue(result is not None)
 
     @patch('example.NotImplementedClass')
-    def testUseSomeWeirdClass(self, mocking_not_implemented_class):
+    def testMethodWithNotImplementedClass(self, mock):
         # Arrange
+        value = 'some_value'
+        mock.notImplementedMethod(value).return_value = False
         # Act
-        methodWithNotImplementedClass()
+        result = methodWithNotImplementedClass(value)
         # Assert
-        mocking_not_implemented_class.assert_called_with()
-        mocking_not_implemented_class.not_implemented_method.foo.has_been_called()
+        mock.notImplementedMethod.assert_called_with(value)
+        self.assertFalse(result)
