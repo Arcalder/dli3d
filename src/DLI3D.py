@@ -78,7 +78,7 @@ class Application(QtGui.QWidget):
         grid.addWidget(self.heightInput, 0, 2)
         grid.addWidget(QtGui.QLabel('Step'), 1 , 0)
         grid.addWidget(self.stepInput, 1, 2)
-        grid.addWidget(QtGui.QLabel('Layer Thickness'), 2 , 0)
+        grid.addWidget(QtGui.QLabel('Layer Thickness (for slicing with a disk (height of disk))'), 2 , 0)
         grid.addWidget(self.layerInput, 2, 2)
         grid.addWidget(QtGui.QLabel('Seconds of exposition'), 3 , 0)
         grid.addWidget(self.secondsInput, 3, 2)
