@@ -46,6 +46,7 @@ class Application(QtGui.QWidget):
         self.stepInput = QtGui.QLineEdit()
         self.layerInput = QtGui.QLineEdit()
         self.secondsInput = QtGui.QLineEdit()
+        self.arduinoPortInput = QtGui.QLineEdit()
         
 #        self.layerInput.textChanged('',self.checker())
 #        self.layerInput.textChanged('',self.checker())
@@ -82,15 +83,18 @@ class Application(QtGui.QWidget):
         grid.addWidget(self.layerInput, 2, 2)
         grid.addWidget(QtGui.QLabel('Seconds of exposure'), 3 , 0)
         grid.addWidget(self.secondsInput, 3, 2)
-        grid.addWidget(self.dirLabel, 4 , 0)
-        grid.addWidget(self.outputButton, 4, 2)
+        grid.addWidget(QtGui.QLabel('Arduino Port'), 4 , 0)
+        grid.addWidget(self.arduinoPortInput, 4, 2)
         
-        grid.addWidget(self.stlLabel, 5,0)
-        grid.addWidget(self.openSTLButton, 5, 2)
+        grid.addWidget(self.dirLabel, 5 , 0)
+        grid.addWidget(self.outputButton, 5, 2)
         
-        grid.addWidget(self.printLabel, 6,0)
-        grid.addWidget(QtGui.QLabel(''), 6 , 1)
-        grid.addWidget(self.createAnimationButton, 6, 2)
+        grid.addWidget(self.stlLabel, 6,0)
+        grid.addWidget(self.openSTLButton, 6, 2)
+        
+        grid.addWidget(self.printLabel, 7,0)
+        grid.addWidget(QtGui.QLabel(''), 7 , 1)
+        grid.addWidget(self.createAnimationButton, 7, 2)
         
         self.setLayout(grid)
         self.setWindowTitle('DLI3D')
