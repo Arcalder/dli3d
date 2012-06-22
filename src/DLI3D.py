@@ -4,9 +4,26 @@
 import sys
 import os
 from PyQt4 import QtGui
+from PyQt4.Qt import QRect
+from PyQt4.QtGui import QWidget, QPainter, QApplication
 sys.path.append(os.path.join(os.getcwd(), '..', 'lib'))
 
 from slices import *
+
+class SecondaryWindow(QWidget):
+    def __init__(self):
+        QWidget.__init__(self)
+        pDesktop = QApplication.desktop ();
+        RectScreen0 = pDesktop.screenGeometry (1);
+        # Se conecta a proyectores -> importa la relación de sus resoluciones.
+        self.setGeometry(QRect(RectScreen0.left(), RectScreen0.top(), RectScreen0.width(), RectScreen0.height())) # x, y, w, h
+
+    #TODO
+    # Que se desplieguen las imagenes
+    def paintEvent(self, e):
+        dc = QPainter(self)
+        dc.drawLine(0, 0, 500, 500)
+        dc.drawLine(500, 0, 0, 500)
 
 class Application(QtGui.QWidget):
     
@@ -28,6 +45,7 @@ class Application(QtGui.QWidget):
         self.heightInput = QtGui.QLineEdit()
         self.stepInput = QtGui.QLineEdit()
         self.layerInput = QtGui.QLineEdit()
+        self.secondsInput = QtGui.QLineEdit()
         
 #        self.layerInput.textChanged('',self.checker())
 #        self.layerInput.textChanged('',self.checker())
@@ -48,7 +66,7 @@ class Application(QtGui.QWidget):
         
         self.createAnimationButton = QtGui.QPushButton('Print')
         self.createAnimationButton.setEnabled(False)
-## createAnimationButton.clicked.connect(self.makeAnimation)
+	self.createAnimationButton.clicked.connect(self.makeAnimation)
 
         #welcome = QtGui.QLabel('<h1>Welcome</h1>', self)
         self.printLabel = QtGui.QLabel('When you are ready press Print to start printing')
@@ -62,14 +80,17 @@ class Application(QtGui.QWidget):
         grid.addWidget(self.stepInput, 1, 2)
         grid.addWidget(QtGui.QLabel('Layer Thickness'), 2 , 0)
         grid.addWidget(self.layerInput, 2, 2)
-        grid.addWidget(self.dirLabel, 3 , 0)
-        grid.addWidget(self.outputButton, 3, 2)
+        grid.addWidget(QtGui.QLabel('Seconds of exposition'), 3 , 0)
+        grid.addWidget(self.secondsInput, 3, 2)
+        grid.addWidget(self.dirLabel, 4 , 0)
+        grid.addWidget(self.outputButton, 4, 2)
         
-        grid.addWidget(self.stlLabel, 4,0)
-        grid.addWidget(self.printLabel, 5,0)
-        grid.addWidget(QtGui.QLabel(''), 4 , 1)
-        grid.addWidget(self.openSTLButton, 4, 2)
-        grid.addWidget(self.createAnimationButton, 5, 2)
+        grid.addWidget(self.stlLabel, 5,0)
+        grid.addWidget(self.openSTLButton, 5, 2)
+        
+        grid.addWidget(self.printLabel, 6,0)
+        grid.addWidget(QtGui.QLabel(''), 6 , 1)
+        grid.addWidget(self.createAnimationButton, 6, 2)
         
         self.setLayout(grid)
         self.setWindowTitle('DLI3D')
@@ -95,8 +116,11 @@ class Application(QtGui.QWidget):
          self.dirLabel.setText("Selected directory: " + dirName)
          self.checker()
     
-## def makeAnimation(self):
+    def makeAnimation(self):
         ##insertar el codigo que crea la animación
+        self.secondWindow = SecondaryWindow()
+        self.secondWindow.show()
+        
     def center(self):
         
         qr = self.frameGeometry()
