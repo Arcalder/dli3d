@@ -16,7 +16,7 @@ def createSlices(height,output,path,step,layer_thickness):
     os.chdir(os.path.join('..', 'bin', 'slicer'))
     print os.getcwd()
     #os.system("slice "+path+" -z0,"+str(height)+",0.5 -o "+output)
-    cmd ="slice "+path+" -z0,"+str(height)+","+str(step)+" -l "+str(layer_thickness)+" -o "+output
+    cmd ="slice "+path+" -z0,"+str(height)+","+str(step)+" -l "+str(layer_thickness)+" --core=white --background=black -o "+output
     print cmd
     os.system(cmd)
     
