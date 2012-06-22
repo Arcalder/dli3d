@@ -97,7 +97,9 @@ class Application(QtGui.QWidget):
         self.show()
         
     def createImages(self,fileName):
-        createSlices(self.heightInput.text(), str(self.outputFileName)+'.jpg', str(fileName), self.stepInput.text(), self.layerInput.text())
+        exec_id = 'EXEC_ID'
+        output_path = os.path.join(str(self.outputFileName), "%s.%s" % (exec_id, 'jpg'))
+        createSlices(self.heightInput.text(), output_path, str(fileName), self.stepInput.text(), self.layerInput.text())
     
     def showOpenFile(self):
         fileName = QtGui.QFileDialog.getOpenFileName(self, 'Open file',

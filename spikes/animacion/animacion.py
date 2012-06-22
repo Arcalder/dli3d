@@ -1,17 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-#
-# Taken and customed from Jack Valmadre's Blog:
-# http://jackvalmadre.wordpress.com/2008/09/21/resizable-image-control/
-#
-# Put together and created the time switching by Izidor Matusov <izidor.matusov@gmail.com>
-
 import os
-
-import pygtk
-pygtk.require('2.0')
-import gtk
-import glib
+from PyQt4 import QtCore, QtGui
+import PIL
+from PIL import Image
 
 def is_image(filename):
     """ File is image if it has a common suffix and it is a regular file """
@@ -25,216 +15,143 @@ def is_image(filename):
 
     return False
 
-def resizeToFit(image, frame, aspect=True, enlarge=False):
-    """Resizes a rectangle to fit within another.
+def load_file_list(folder):
+    """ Find all images """
+    files = []
+    images = []
+    index = 0
+    for filename in os.listdir(folder):
+        files.append(folder+filename)
+    return files
 
-    Parameters:
-    image -- A tuple of the original dimensions (width, height).
-    frame -- A tuple of the target dimensions (width, height).
-    aspect -- Maintain aspect ratio?
-    enlarge -- Allow image to be scaled up?
+class Display_images(QtGui.QWidget):
+ 
+    
+    __pyqtSignals__ = ("timeChanged(QTime)", "timeZoneChanged(int)")
+    
+    def __init__(self, folder ='./imagenes/'):
+    
+        QtGui.QWidget.__init__(self, None)
 
-    """
-    if aspect:
-        return scaleToFit(image, frame, enlarge)
-    else:
-        return stretchToFit(image, frame, enlarge)
+        self.folder = folder
+        self.timeZoneOffset = 0
 
-def scaleToFit(image, frame, enlarge=False):
-    image_width, image_height = image
-    frame_width, frame_height = frame
-    image_aspect = float(image_width) / image_height
-    frame_aspect = float(frame_width) / frame_height
-    # Determine maximum width/height (prevent up-scaling).
-    if not enlarge:
-        max_width = min(frame_width, image_width)
-        max_height = min(frame_height, image_height)
-    else:
-        max_width = frame_width
-        max_height = frame_height
-    # Frame is wider than image.
-    if frame_aspect > image_aspect:
-        height = max_height
-        width = int(height * image_aspect)
-    # Frame is taller than image.
-    else:
-        width = max_width
-        height = int(width / image_aspect)
-    return (width, height)
+        self.i = 0
+        self.para_blanco = 0
+        self.time = QtCore.QTime.currentTime()
+        
+        timer = QtCore.QTimer(self)
+        self.connect(timer, QtCore.SIGNAL("timeout()"), self, QtCore.SLOT("update()"))
+        self.connect(timer, QtCore.SIGNAL("timeout()"), self.updateTime)
+        timer.start(1)
 
-def stretchToFit(image, frame, enlarge=False):
-    image_width, image_height = image
-    frame_width, frame_height = frame
-    # Stop image from being blown up.
-    if not enlarge:
-        width = min(frame_width, image_width)
-        height = min(frame_height, image_height)
-    else:
-        width = frame_width
-        height = frame_height
-    return (width, height)
+        self.imagenes = load_file_list(folder)
+        
+        self.label =  QtGui.QLabel(self)
+        self.label.setPixmap(QtGui.QPixmap("white.jpg"))
+        self.label.setScaledContents(True)
+        
+        self.setWindowTitle(QtCore.QObject.tr(self, "DLI3D"))
+        self.resize(600, 600)
+        
+        grid = QtGui.QGridLayout()
+        grid.setSpacing(10)
+        grid.addWidget(self.label, 1,0)
+
+        self.setLayout(grid)
+
+        self.show()
+
+    def paintEvent(self, event):
+
+        time = QtCore.QTime.currentTime()
+
+        ahora = time.hour()*60*60*1000+time.minute()*60*1000+time.second()*1000+time.msec()
+
+        anterior = self.time.hour()*60*60*1000+self.time.minute()*60*1000+self.time.second()*1000+self.time.msec()
+
+        
+        #time = time.addSecs(self.timeZoneOffset * 3600)
+        #time = time.addMSecs(self.timeZoneOffset * 3600000)
+        #now = time.second()
+
+        if anterior + 1000 < ahora and self.i < len(self.imagenes):
+
+            self.para_blanco += 1
+
+            if self.para_blanco%2 == 1:
+                self.label.setPixmap(QtGui.QPixmap("white.jpg"))
+            else:
+                self.i += 1
+                archivo = self.imagenes[self.i]
+                self.label.setPixmap(QtGui.QPixmap(archivo))
+
+            print self.time
+            print time
+            print "----"
+
+                       
+
+            self.time = time
+            
 
 
-class ResizableImage(gtk.DrawingArea):
+        #painter.rotate(30.0 * ((time.hour() + time.minute() / 60.0)))
 
-    def __init__(self, aspect=True, enlarge=False,
-            interp=gtk.gdk.INTERP_NEAREST, backcolor=None, max=(1600,1200)):
-        """Construct a ResizableImage control.
+        #painter.rotate(6.0 * (time.minute() + time.second() / 60.0))
 
-        Parameters:
-        aspect -- Maintain aspect ratio?
-        enlarge -- Allow image to be scaled up?
-        interp -- Method of interpolation to be used.
-        backcolor -- Tuple (R, G, B) with values ranging from 0 to 1,
-            or None for transparent.
-        max -- Max dimensions for internal image (width, height).
+    
+    def minimumSizeHint(self):
+    
+        return QtCore.QSize(50, 50)
+    
+    def sizeHint(self):
+    
+        return QtCore.QSize(100, 100)
+    
+    def updateTime(self):
+    
+        self.emit(QtCore.SIGNAL("timeChanged(QTime)"), QtCore.QTime.currentTime())
+    
+    # The timeZone property is implemented using the getTimeZone() getter
+    # method, the setTimeZone() setter method, and the resetTimeZone() method.
+    
+    # The getter just returns the internal time zone value.
+    def getTimeZone(self):
+    
+        return self.timeZoneOffset
+    
+    # The setTimeZone() method is also defined to be a slot. The @pyqtSignature
+    # decorator is used to tell PyQt which argument type the method expects,
+    # and is especially useful when you want to define slots with the same
+    # name that accept different argument types.
+    
+    @QtCore.pyqtSignature("setTimeZone(int)")
+    def setTimeZone(self, value):
+    
+        self.timeZoneOffset = value
+        self.emit(QtCore.SIGNAL("timeZoneChanged(int)"), value)
+        self.update()
+    
+    # Qt's property system supports properties that can be reset to their
+    # original values. This method enables the timeZone property to be reset.
+    def resetTimeZone(self):
+    
+        self.timeZoneOffset = 0
+        self.emit(QtCore.SIGNAL("timeZoneChanged(int)"), 0)
+        self.update()
+    
+    # Qt-style properties are defined differently to Python's properties.
+    # To declare a property, we call pyqtProperty() to specify the type and,
+    # in this case, getter, setter and resetter methods.
+    timeZone = QtCore.pyqtProperty("int", getTimeZone, setTimeZone, resetTimeZone)
 
-        """
-        super(ResizableImage, self).__init__()
-        self.pixbuf = None
-        self.aspect = aspect
-        self.enlarge = enlarge
-        self.interp = interp
-        self.backcolor = backcolor
-        self.max = max
-        self.connect('expose_event', self.expose)
-        self.connect('realize', self.on_realize)
-
-    def on_realize(self, widget):
-        if self.backcolor is None:
-            color = gtk.gdk.Color()
-        else:
-            color = gtk.gdk.Color(*self.backcolor)
-
-        self.window.set_background(color)
-
-    def expose(self, widget, event):
-        # Load Cairo drawing context.
-        self.context = self.window.cairo_create()
-        # Set a clip region.
-        self.context.rectangle(
-            event.area.x, event.area.y,
-            event.area.width, event.area.height)
-        self.context.clip()
-        # Render image.
-        self.draw(self.context)
-        return False
-
-    def draw(self, context):
-        # Get dimensions.
-        rect = self.get_allocation()
-        x, y = rect.x, rect.y
-        # Remove parent offset, if any.
-        parent = self.get_parent()
-        if parent:
-            offset = parent.get_allocation()
-            x -= offset.x
-            y -= offset.y
-        # Fill background color.
-        if self.backcolor:
-            context.rectangle(x, y, rect.width, rect.height)
-            context.set_source_rgb(*self.backcolor)
-            context.fill_preserve()
-        # Check if there is an image.
-        if not self.pixbuf:
-            return
-        width, height = resizeToFit(
-            (self.pixbuf.get_width(), self.pixbuf.get_height()),
-            (rect.width, rect.height),
-            self.aspect,
-            self.enlarge)
-        x = x + (rect.width - width) / 2
-        y = y + (rect.height - height) / 2
-        context.set_source_pixbuf(
-            self.pixbuf.scale_simple(width, height, self.interp), x, y)
-        context.paint()
-
-    def set_from_pixbuf(self, pixbuf):
-        width, height = pixbuf.get_width(), pixbuf.get_height()
-        # Limit size of internal pixbuf to increase speed.
-        if not self.max or (width < self.max[0] and height < self.max[1]):
-            self.pixbuf = pixbuf
-        else:
-            width, height = resizeToFit((width, height), self.max)
-            self.pixbuf = pixbuf.scale_simple(
-                width, height,
-                gtk.gdk.INTERP_BILINEAR)
-        self.invalidate()
-
-    def set_from_file(self, filename):
-        self.set_from_pixbuf(gtk.gdk.pixbuf_new_from_file(filename))
-
-    def invalidate(self):
-        self.queue_draw()
-
-class DemoGtk:
-
-    SECONDS_BETWEEN_PICTURES = 3
-    FULLSCREEN = True
-    WALK_INSTEAD_LISTDIR = True
-
-    def __init__(self, SECONDS_BETWEEN_PICTURES):
-        self.window = gtk.Window()
-        self.window.connect('destroy', gtk.main_quit)
-        self.window.set_title('DLI3d')
-
-        self.SECONDS_BETWEEN_PICTURES = SECONDS_BETWEEN_PICTURES
-
-        self.image = ResizableImage( True, True, gtk.gdk.INTERP_BILINEAR)
-        self.image.show()
-        self.window.add(self.image)
-
-        self.load_file_list()
-
-        self.window.show_all()
-
-        if self.FULLSCREEN:
-            self.window.fullscreen()
-
-        glib.timeout_add_seconds(self.SECONDS_BETWEEN_PICTURES, self.on_tick)
-        self.display()
-
-    def load_file_list(self):
-        """ Find all images """
-        self.files = []
-        self.index = 0
-
-        if self.WALK_INSTEAD_LISTDIR:
-            for directory, sub_directories, files in os.walk('.'):
-                for filename in files:
-                    if is_image(filename):
-                        filepath = os.path.join(directory, filename)
-                        self.files.append(filepath)
-        else:
-            for filename in os.listdir('.'):
-                if is_image(filename):
-                    self.files.append(filename)
-
-        self.files.sort() #TODO: ordenar numericamente, no alfabeticamente
-
-        print "Images:", self.files
-
-    def display(self):
-        """ Sent a request to change picture if it is possible """
-        if 0 <= self.index < len(self.files):
-            self.image.set_from_file(self.files[self.index])
-            return True
-        else:
-            return False
-
-    def on_tick(self):
-        """ Skip to another picture.
-
-        If this picture is last, go to the first one. """
-        self.index += 1
-        if self.index >= len(self.files):
-            #self.index = 0
-            gtk.main_quit()
-
-        return self.display()
 
 if __name__ == "__main__":
-    gui = DemoGtk(3)
-    gtk.main()
 
-# vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4
+    import sys
+
+    app = QtGui.QApplication(sys.argv)
+    clock = Display_images()
+    
+    sys.exit(app.exec_())
