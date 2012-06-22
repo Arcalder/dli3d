@@ -1,7 +1,8 @@
 import os
-import subprocess
+# import subprocess
 
-def createSlices(height,output,path,step,layer_thickness):
+
+def createSlices(height, output, path, step, layer_thickness):
     os.chdir(output)
     os.system("slice "+path+" -z0,"+str(height)+","+str(step)+" -l "+str(layer_thickness)+" -o "+output+".jpg")
 
