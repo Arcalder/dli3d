@@ -57,10 +57,10 @@ class Application(QtGui.QWidget):
         self.stlLabel = QtGui.QLabel('Please, select the STL file you want to print')
         
         self.outputFileName = ''
-        self.outputButton = QtGui.QPushButton('Open Folder')
+        self.outputButton = QtGui.QPushButton('Select Folder')
         self.outputButton.clicked.connect(self.showOpenFileOutput)
          
-        self.openSTLButton = QtGui.QPushButton('Open STL')
+        self.openSTLButton = QtGui.QPushButton('Open STL to create the slices')
         self.openSTLButton.clicked.connect(self.showOpenFile)
         self.openSTLButton.setEnabled(False)
         
