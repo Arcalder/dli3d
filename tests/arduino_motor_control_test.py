@@ -82,7 +82,7 @@ class TestArduinoMotorControl(unittest.TestCase):
 		mock_arduino_motor_control_class.write.assert_called_with('c')
 
 	@patch('serial.Serial')
-	def TestOpenVale(self, mock_arduino_motor_control_class):
+	def TestOpenValve(self, mock_arduino_motor_control_class):
 		#arrange
 		PORT = 'COM6'
 		arduino = ArduinoMotorControl(PORT)
@@ -92,8 +92,16 @@ class TestArduinoMotorControl(unittest.TestCase):
 		#assert
 		self.assertTrue(arduino is not None)
 		mock_arduino_motor_control_class.write.assert_called_with('o')
-
-
-
-
-
+		
+	@patch('serial.Serial')
+	def testOpenCloseValve(self, mock_arduino_motor_control_class):
+		#arrange
+		PORT = 'COM6'
+		time_open = 0.5
+		arduino = ArduinoMotorControl(PORT)
+		mock_arduino_motor_control_class.write('o').return_value = None
+		#act
+		arduino.open_close_valve(time_open)
+		#assert
+		self.assertTrue(arduino is not None)
+		#mock_arduino_motor_control_class.write.assert_called_with('o')
