@@ -51,7 +51,7 @@ class ArduinoMotorControl():
 			print "Arduino no conectado: abriendo bandeja"
 	
 	def open_close_valve(self, time_open):
-		self.open_valve
+		self.open_valve()
 		time.sleep(time_open)
 		self.close_valve()
 
