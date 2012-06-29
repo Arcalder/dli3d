@@ -40,12 +40,12 @@ def getTimeFromVolume(volume):
 	return time
 
 class Display_images(QWidget):#QWidget):
- 
-    
+
+
     __pyqtSignals__ = ("timeChanged(QTime)", "timeZoneChanged(int)")
-    
-    def __init__(self, folder ='./animacion/', parent = None, seconds = 1, height = 1):
-    
+
+    def __init__(self, folder ='./animacion/', parent = None, seconds = 1, height = 1, arduino = None):
+
         #QtGui.QWidget.__init__(self, parent)
         #QtGui.QDialog.__init__(self, parent)
         QWidget.__init__(self)
@@ -53,8 +53,8 @@ class Display_images(QWidget):#QWidget):
 
         self.folder = folder
         self.time_to_change = int(seconds*1000)
-        self.black_time = 1000 
-        
+        self.black_time = 1000
+
         self.arduino = arduino
         print "t = ",self.time_to_change, " tb = ", self.black_time
         self.timeZoneOffset = 0
@@ -63,21 +63,21 @@ class Display_images(QWidget):#QWidget):
         self.num_imagen = 0
         self.para_blanco = 0
         self.time = QtCore.QTime.currentTime()
-        
+
         timer = QtCore.QTimer(self)
         self.connect(timer, QtCore.SIGNAL("timeout()"), self, QtCore.SLOT("update()"))
         self.connect(timer, QtCore.SIGNAL("timeout()"), self.updateTime)
         timer.start(1)
 
         self.imagenes = load_file_list(self.folder)
-        
+
         self.label =  QtGui.QLabel(self)
         self.label.setStyleSheet("QLabel { background-color : black;}");
         self.label.setScaledContents(True)
-        
+
         self.setWindowTitle(QtCore.QObject.tr(self, "DLI3D"))
         self.resize(800, 600)
-        
+
         grid = QtGui.QGridLayout()
         grid.setSpacing(10)
         grid.addWidget(self.label, 1,0)
@@ -87,10 +87,10 @@ class Display_images(QWidget):#QWidget):
         RectScreen0 = pDesktop.screenGeometry (1);
         # Se conecta a proyectores -> importa la relacion de sus resoluciones.
         self.setGeometry(QRect(RectScreen0.left(), RectScreen0.top(), RectScreen0.width(), RectScreen0.height())) # x, y, w, h
-        
+
         #Se crea un acumulador de volumen
         self.acumulator = acumulator(height)
-        
+
         self.show()
 
     def paintEvent(self, event):
@@ -101,7 +101,7 @@ class Display_images(QWidget):#QWidget):
 
         anterior = self.time.hour()*60*60*1000+self.time.minute()*60*1000+self.time.second()*1000+self.time.msec()
 
-        
+
         #time = time.addSecs(self.timeZoneOffset * 3600)
         #time = time.addMSecs(self.timeZoneOffset * 3600000)
         #now = time.second()
@@ -111,72 +111,72 @@ class Display_images(QWidget):#QWidget):
         if self.para_blanco%2 == 1:
             #print "para blanco: ", self.para_blanco
             if (anterior + self.black_time < ahora ) and (self.num_imagen < len(self.imagenes)):
-                #print "cambia: ", self.imagenes[self.num_imagen]                
+                #print "cambia: ", self.imagenes[self.num_imagen]
                 self.label.setPixmap(QtGui.QPixmap(self.imagenes[self.num_imagen]))
                 self.para_blanco += 1
                 self.time = time
         else:
             #print "para blanco: ", self.para_blanco
-            if (anterior + self.time_to_change  < ahora ):   
+            if (anterior + self.time_to_change  < ahora ):
                 #print "borrar"
                 self.label.clear()
                 arduino.move_up()
                 self.para_blanco += 1
                 self.time = time
-                
+
                 #Control de la valvula con Arduino
                 self.acumulator.acumulate(self.imagenes[self.num_imagen])
                 self.num_imagen += 1
                 if self.acumulator.getVolume() >= ACTIVATION_VOLUME:
-                	openTime = getTimeFromVolume(self.totalVolume)
-			#arduino.open_close_valve(openTime)
-                
-                
+                    openTime = getTimeFromVolume(self.totalVolume)
+                    arduino.open_close_valve(openTime)
+
+
 
         if self.num_imagen >= len(self.imagenes):
             self.label.clear()
 
-    
+
     def minimumSizeHint(self):
-    
+
         return QtCore.QSize(50, 50)
-    
+
     def sizeHint(self):
-    
+
         return QtCore.QSize(100, 100)
-    
+
     def updateTime(self):
-    
+
         self.emit(QtCore.SIGNAL("timeChanged(QTime)"), QtCore.QTime.currentTime())
-    
+
     # The timeZone property is implemented using the getTimeZone() getter
     # method, the setTimeZone() setter method, and the resetTimeZone() method.
-    
+
     # The getter just returns the internal time zone value.
     def getTimeZone(self):
-    
+
         return self.timeZoneOffset
-    
+
     # The setTimeZone() method is also defined to be a slot. The @pyqtSignature
     # decorator is used to tell PyQt which argument type the method expects,
     # and is especially useful when you want to define slots with the same
     # name that accept different argument types.
-    
+
     @QtCore.pyqtSignature("setTimeZone(int)")
     def setTimeZone(self, value):
-    
+
         self.timeZoneOffset = value
         self.emit(QtCore.SIGNAL("timeZoneChanged(int)"), value)
         self.update()
-    
+
     # Qt's property system supports properties that can be reset to their
     # original values. This method enables the timeZone property to be reset.
     def resetTimeZone(self):
-    
+
         self.timeZoneOffset = 0
         self.emit(QtCore.SIGNAL("timeZoneChanged(int)"), 0)
         self.update()
-    
+
     # Qt-style properties are defined differently to Python's properties.
     # To declare a property, we call pyqtProperty() to specify the type and,
     # in this case, getter, setter and resetter methods.
@@ -189,5 +189,5 @@ if __name__ == "__main__":
 
     app = QtGui.QApplication(sys.argv)
     clock = Display_images()
-    
+
     sys.exit(app.exec_())

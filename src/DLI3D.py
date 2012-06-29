@@ -138,8 +138,8 @@ class Application(QtGui.QWidget):
     def makeAnimation(self):
         ##insertar el codigo que crea la animación
         #self.secondWindow = SecondaryWindow()
-        arduino = ArduinoMotorControl(self.arduinoPortInput)
-        self.display_window = Display_images( parent = self, folder = self.outputFileName, seconds = int(self.secondsInput.text()), height = self.stepInput.text(), arduino)
+        arduino = ArduinoMotorControl(self.arduinoPortInput.text())
+        self.display_window = Display_images( parent = self, folder = self.outputFileName, seconds = int(self.secondsInput.text()), height = self.stepInput.text(), arduino=arduino)
         #self.display_window.show()
         #self.secondWindow.show()
 
