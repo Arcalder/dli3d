@@ -36,8 +36,8 @@ ACTIVATION_VOLUME = 40
 SPEED = 1
 #Calcula la cantidad de segundos que se debe abrir la valvula dado un volumen
 def getTimeFromVolume(volume):
-	time = volume/SPEED
-	return time
+    time = volume/SPEED
+    return time
 
 class Display_images(QWidget):#QWidget):
 
@@ -96,7 +96,6 @@ class Display_images(QWidget):#QWidget):
     def paintEvent(self, event):
 
         time = QtCore.QTime.currentTime()
-
         ahora = time.hour()*60*60*1000+time.minute()*60*1000+time.second()*1000+time.msec()
 
         anterior = self.time.hour()*60*60*1000+self.time.minute()*60*1000+self.time.second()*1000+self.time.msec()
@@ -111,25 +110,28 @@ class Display_images(QWidget):#QWidget):
         if self.para_blanco%2 == 1:
             #print "para blanco: ", self.para_blanco
             if (anterior + self.black_time < ahora ) and (self.num_imagen < len(self.imagenes)):
+                print 'se cambia imagen'
                 #print "cambia: ", self.imagenes[self.num_imagen]
                 self.label.setPixmap(QtGui.QPixmap(self.imagenes[self.num_imagen]))
                 self.para_blanco += 1
+                self.num_imagen += 1
                 self.time = time
         else:
             #print "para blanco: ", self.para_blanco
             if (anterior + self.time_to_change  < ahora ):
                 #print "borrar"
                 self.label.clear()
-                arduino.move_up()
+                self.arduino.move_up()
                 self.para_blanco += 1
                 self.time = time
 
                 #Control de la valvula con Arduino
-                self.acumulator.acumulate(self.imagenes[self.num_imagen])
-                self.num_imagen += 1
+                self.acumulator.acumulate(self.imagenes[self.num_imagen-1])
+                
                 if self.acumulator.getVolume() >= ACTIVATION_VOLUME:
-                    openTime = getTimeFromVolume(self.totalVolume)
-                    arduino.open_close_valve(openTime)
+                    #openTime = getTimeFromVolume(self.acumulator.getVolume())
+                    #self.acumulator.reset()
+                    self.arduino.open_close_valve(0.5)
 
 
 

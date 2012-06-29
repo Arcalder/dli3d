@@ -10,6 +10,7 @@ sys.path.append(os.path.join(os.getcwd(), '..', 'lib'))
 
 from slices import *
 from animacion import *
+from arduino_motor_control import *
 
 '''
 class SecondaryWindow(QWidget):
@@ -138,7 +139,8 @@ class Application(QtGui.QWidget):
     def makeAnimation(self):
         ##insertar el codigo que crea la animación
         #self.secondWindow = SecondaryWindow()
-        arduino = ArduinoMotorControl(self.arduinoPortInput.text())
+        arduino = ArduinoMotorControl(str(self.arduinoPortInput.text()))
+        #arduino = ArduinoMotorControl('COM4')
         self.display_window = Display_images( parent = self, folder = self.outputFileName, seconds = int(self.secondsInput.text()), height = self.stepInput.text(), arduino=arduino)
         #self.display_window.show()
         #self.secondWindow.show()
