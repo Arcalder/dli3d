@@ -34,7 +34,7 @@ class Display_images(QWidget):#QWidget):
     
     __pyqtSignals__ = ("timeChanged(QTime)", "timeZoneChanged(int)")
     
-    def __init__(self, folder ='./animacion/', parent = None, seconds = 1):
+    def __init__(self, folder ='./animacion/', parent = None, seconds = 1, arduino):
     
         #QtGui.QWidget.__init__(self, parent)
         #QtGui.QDialog.__init__(self, parent)
@@ -44,7 +44,8 @@ class Display_images(QWidget):#QWidget):
         self.folder = folder
         self.time_to_change = int(seconds*1000)
         self.black_time = 1000 
-
+        
+        self.arduino = arduino
         print "t = ",self.time_to_change, " tb = ", self.black_time
         self.timeZoneOffset = 0
 
@@ -106,6 +107,7 @@ class Display_images(QWidget):#QWidget):
             if (anterior + self.time_to_change  < ahora ):   
                 #print "borrar"
                 self.label.clear()
+                arduino.move_up()
                 self.para_blanco += 1
                 self.time = time
 
