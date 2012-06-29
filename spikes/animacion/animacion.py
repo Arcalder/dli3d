@@ -1,7 +1,12 @@
 import os
 from PyQt4 import QtCore, QtGui
+from PyQt4.Qt import QRect
+from PyQt4.QtGui import QWidget, QPainter, QApplication
 import PIL
 from PIL import Image
+
+
+
 
 def is_image(filename):
     """ File is image if it has a common suffix and it is a regular file """
@@ -32,6 +37,7 @@ class Display_images(QtGui.QWidget):
     def __init__(self, folder ='./imagenes/'):
     
         QtGui.QWidget.__init__(self, None)
+        pDesktop = QApplication.desktop ();
 
         self.folder = folder
         self.timeZoneOffset = 0
@@ -48,7 +54,7 @@ class Display_images(QtGui.QWidget):
         self.imagenes = load_file_list(folder)
         
         self.label =  QtGui.QLabel(self)
-        self.label.setPixmap(QtGui.QPixmap("white.jpg"))
+        self.label.setPixmap(QtGui.QPixmap("black.jpg"))
         self.label.setScaledContents(True)
         
         self.setWindowTitle(QtCore.QObject.tr(self, "DLI3D"))
@@ -60,6 +66,9 @@ class Display_images(QtGui.QWidget):
 
         self.setLayout(grid)
 
+        RectScreen0 = pDesktop.screenGeometry (1);
+        # Se conecta a proyectores -> importa la relacion de sus resoluciones.
+        self.setGeometry(QRect(RectScreen0.left(), RectScreen0.top(), RectScreen0.width(), RectScreen0.height())) # x, y, w, h
         self.show()
 
     def paintEvent(self, event):
