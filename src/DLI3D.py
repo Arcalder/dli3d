@@ -9,7 +9,9 @@ from PyQt4.QtGui import QWidget, QPainter, QApplication
 sys.path.append(os.path.join(os.getcwd(), '..', 'lib'))
 
 from slices import *
+from animacion import *
 
+'''
 class SecondaryWindow(QWidget):
     def __init__(self):
         QWidget.__init__(self)
@@ -24,7 +26,7 @@ class SecondaryWindow(QWidget):
         dc = QPainter(self)
         dc.drawLine(0, 0, 500, 500)
         dc.drawLine(500, 0, 0, 500)
-
+'''
 class Application(QtGui.QWidget):
     
     def __init__(self):
@@ -46,6 +48,7 @@ class Application(QtGui.QWidget):
         self.stepInput = QtGui.QLineEdit()
         self.layerInput = QtGui.QLineEdit()
         self.secondsInput = QtGui.QLineEdit()
+        self.arduinoPortInput = QtGui.QLineEdit()
         
 #        self.layerInput.textChanged('',self.checker())
 #        self.layerInput.textChanged('',self.checker())
@@ -66,7 +69,7 @@ class Application(QtGui.QWidget):
         
         self.createAnimationButton = QtGui.QPushButton('Print')
         self.createAnimationButton.setEnabled(False)
-	self.createAnimationButton.clicked.connect(self.makeAnimation)
+        self.createAnimationButton.clicked.connect(self.makeAnimation)
 
         #welcome = QtGui.QLabel('<h1>Welcome</h1>', self)
         self.printLabel = QtGui.QLabel('When you are ready press Print to start printing')
@@ -78,19 +81,22 @@ class Application(QtGui.QWidget):
         grid.addWidget(self.heightInput, 0, 2)
         grid.addWidget(QtGui.QLabel('Step'), 1 , 0)
         grid.addWidget(self.stepInput, 1, 2)
-        grid.addWidget(QtGui.QLabel('Layer Thickness'), 2 , 0)
+        grid.addWidget(QtGui.QLabel('Layer Thickness (for slicing with a disk (height of disk))'), 2 , 0)
         grid.addWidget(self.layerInput, 2, 2)
-        grid.addWidget(QtGui.QLabel('Seconds of exposition'), 3 , 0)
+        grid.addWidget(QtGui.QLabel('Seconds of exposure'), 3 , 0)
         grid.addWidget(self.secondsInput, 3, 2)
-        grid.addWidget(self.dirLabel, 4 , 0)
-        grid.addWidget(self.outputButton, 4, 2)
+        grid.addWidget(QtGui.QLabel('Arduino Port'), 4 , 0)
+        grid.addWidget(self.arduinoPortInput, 4, 2)
         
-        grid.addWidget(self.stlLabel, 5,0)
-        grid.addWidget(self.openSTLButton, 5, 2)
+        grid.addWidget(self.dirLabel, 5 , 0)
+        grid.addWidget(self.outputButton, 5, 2)
         
-        grid.addWidget(self.printLabel, 6,0)
-        grid.addWidget(QtGui.QLabel(''), 6 , 1)
-        grid.addWidget(self.createAnimationButton, 6, 2)
+        grid.addWidget(self.stlLabel, 6,0)
+        grid.addWidget(self.openSTLButton, 6, 2)
+        
+        grid.addWidget(self.printLabel, 7,0)
+        grid.addWidget(QtGui.QLabel(''), 7 , 1)
+        grid.addWidget(self.createAnimationButton, 7, 2)
         
         self.setLayout(grid)
         self.setWindowTitle('DLI3D')
@@ -120,8 +126,11 @@ class Application(QtGui.QWidget):
     
     def makeAnimation(self):
         ##insertar el codigo que crea la animación
-        self.secondWindow = SecondaryWindow()
-        self.secondWindow.show()
+        #self.secondWindow = SecondaryWindow()    
+        print "forder = ", self.outputFileName  
+        self.display_window = Display_images( parent = self, folder = self.outputFileName, seconds = int(self.secondsInput.text()) )
+        #self.display_window.show()
+        #self.secondWindow.show()
         
     def center(self):
         
