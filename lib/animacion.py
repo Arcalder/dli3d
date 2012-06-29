@@ -4,6 +4,7 @@ from PyQt4.Qt import QRect
 from PyQt4.QtGui import QWidget, QPainter, QApplication
 import PIL
 from PIL import Image
+from volumeAcumulator import acumulator
 
 def is_image(filename):
     """ File is image if it has a common suffix and it is a regular file """
@@ -29,12 +30,21 @@ def load_file_list(folder):
         #print filename
     return files
 
+#Volumen de activacion de la valvula
+ACTIVATION_VOLUME = 40
+#Velocidad en mililitros por segundos
+SPEED = 1
+#Calcula la cantidad de segundos que se debe abrir la valvula dado un volumen
+def getTimeFromVolume(volume):
+	time = volume/SPEED
+	return time
+
 class Display_images(QWidget):#QWidget):
  
     
     __pyqtSignals__ = ("timeChanged(QTime)", "timeZoneChanged(int)")
     
-    def __init__(self, folder ='./animacion/', parent = None, seconds = 1, arduino):
+    def __init__(self, folder ='./animacion/', parent = None, seconds = 1, height = 1):
     
         #QtGui.QWidget.__init__(self, parent)
         #QtGui.QDialog.__init__(self, parent)
@@ -77,6 +87,10 @@ class Display_images(QWidget):#QWidget):
         RectScreen0 = pDesktop.screenGeometry (1);
         # Se conecta a proyectores -> importa la relacion de sus resoluciones.
         self.setGeometry(QRect(RectScreen0.left(), RectScreen0.top(), RectScreen0.width(), RectScreen0.height())) # x, y, w, h
+        
+        #Se crea un acumulador de volumen
+        self.acumulator = acumulator(height)
+        
         self.show()
 
     def paintEvent(self, event):
@@ -99,7 +113,6 @@ class Display_images(QWidget):#QWidget):
             if (anterior + self.black_time < ahora ) and (self.num_imagen < len(self.imagenes)):
                 #print "cambia: ", self.imagenes[self.num_imagen]                
                 self.label.setPixmap(QtGui.QPixmap(self.imagenes[self.num_imagen]))
-                self.num_imagen += 1
                 self.para_blanco += 1
                 self.time = time
         else:
@@ -110,6 +123,15 @@ class Display_images(QWidget):#QWidget):
                 arduino.move_up()
                 self.para_blanco += 1
                 self.time = time
+                
+                #Control de la valvula con Arduino
+                self.acumulator.acumulate(self.imagenes[self.num_imagen])
+                self.num_imagen += 1
+                if self.acumulator.getVolume() >= ACTIVATION_VOLUME:
+                	openTime = getTimeFromVolume(self.totalVolume)
+			#arduino.open_close_valve(openTime)
+                
+                
 
         if self.num_imagen >= len(self.imagenes):
             self.label.clear()
