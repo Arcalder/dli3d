@@ -9,6 +9,7 @@ from PyQt4.QtGui import QWidget, QPainter, QApplication
 #sys.path.append(os.path.join(os.getcwd(), '..', 'lib'))
 
 from slices import *
+from animacion import *
 
 class SecondaryWindow(QWidget):
     def __init__(self):
@@ -66,7 +67,7 @@ class Application(QtGui.QWidget):
         
         self.createAnimationButton = QtGui.QPushButton('Print')
         self.createAnimationButton.setEnabled(False)
-	self.createAnimationButton.clicked.connect(self.makeAnimation)
+        self.createAnimationButton.clicked.connect(self.makeAnimation)
 
         #welcome = QtGui.QLabel('<h1>Welcome</h1>', self)
         self.printLabel = QtGui.QLabel('When you are ready press Print to start printing')
@@ -118,8 +119,9 @@ class Application(QtGui.QWidget):
     
     def makeAnimation(self):
         ##insertar el codigo que crea la animación
-        self.secondWindow = SecondaryWindow()
-        self.secondWindow.show()
+        clock = Display_images(self.outputFileName)
+        #self.secondWindow = SecondaryWindow()
+        #self.secondWindow.show()
 
     def center(self):
         

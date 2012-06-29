@@ -34,7 +34,7 @@ class Display_images(QWidget):#QWidget):
     
     __pyqtSignals__ = ("timeChanged(QTime)", "timeZoneChanged(int)")
     
-    def __init__(self, folder ='./animacion/', parent = None):
+    def __init__(self, folder ='./animacion/', parent = None, seconds = 1):
     
         #QtGui.QWidget.__init__(self, parent)
         #QtGui.QDialog.__init__(self, parent)
@@ -42,11 +42,14 @@ class Display_images(QWidget):#QWidget):
         pDesktop = QApplication.desktop ()
 
         self.folder = folder
-        #print self.folder
+        self.time_to_change = int(seconds*1000)
+        self.black_time = 1000 
 
+        print "t = ",self.time_to_change, " tb = ", self.black_time
         self.timeZoneOffset = 0
 
         self.i = 0
+        self.num_imagen = 0
         self.para_blanco = 0
         self.time = QtCore.QTime.currentTime()
         
@@ -88,35 +91,26 @@ class Display_images(QWidget):#QWidget):
         #time = time.addMSecs(self.timeZoneOffset * 3600000)
         #now = time.second()
 
-        if (anterior + 1000 < ahora )and (self.i < len(self.imagenes)):
+        #print "ahora = ", ahora, "anterior = ", anterior
 
-            dt = 1000-ahora+anterior
-            if dt > 1000: print "Su sistema es muy lento... (dt = ", str(dt) ,")"
-
-            self.para_blanco += 1
-
-            if self.para_blanco%2 == 1:
+        if self.para_blanco%2 == 1:
+            #print "para blanco: ", self.para_blanco
+            if (anterior + self.black_time < ahora ) and (self.num_imagen < len(self.imagenes)):
+                #print "cambia: ", self.imagenes[self.num_imagen]                
+                self.label.setPixmap(QtGui.QPixmap(self.imagenes[self.num_imagen]))
+                self.num_imagen += 1
+                self.para_blanco += 1
+                self.time = time
+        else:
+            #print "para blanco: ", self.para_blanco
+            if (anterior + self.time_to_change  < ahora ):   
+                #print "borrar"
                 self.label.clear()
-            else:
-                print "cambia: ", self.imagenes[self.i]                
-                self.label.setPixmap(QtGui.QPixmap(self.imagenes[self.i]))
-                self.i += 1
+                self.para_blanco += 1
+                self.time = time
 
-            #print self.time
-            #print time
-            #print "----"
-
-            self.time = time
-
-        if self.i >= len(self.imagenes):
+        if self.num_imagen >= len(self.imagenes):
             self.label.clear()
-
-            
-
-
-        #painter.rotate(30.0 * ((time.hour() + time.minute() / 60.0)))
-
-        #painter.rotate(6.0 * (time.minute() + time.second() / 60.0))
 
     
     def minimumSizeHint(self):
