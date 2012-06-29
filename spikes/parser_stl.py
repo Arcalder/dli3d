@@ -3,7 +3,7 @@ import sys
 from struct import *
 
 #
-#Se utiliza así:
+#Se utiliza asi:
 #
 #from parser_stl import STL_Object
 #
@@ -12,6 +12,8 @@ from struct import *
 #stl.make_new_z_axis('x') # "rota" la geometria. El antiguo eje x, pasa a ser el Z
 #
 #altura = stl.align_to_origin() #alinea al origen
+#
+#dimensiones = stl.get_dimesions()
 #
 #stl.export_to_binary_file("arhivo_salida.stl") #guarda el stl modificado en el archivo
 #
@@ -126,6 +128,11 @@ class Vector:
 	def to_string(self):
 		return "("+str(self.x) + ", " + str(self.y) + ", " + str(self.z) + ")"
 		
+	def copy_values(self, v):
+		self.x = v.x
+		self.y = v.y
+		self.z = v.z
+		
 class Cara:
 	def __init__(self):
 		self.normal = Vector()
@@ -133,9 +140,12 @@ class Cara:
 		self.atributos = 0
 
 class STL_Object:
-	#Cara la geometría a partir del archivo de entrada stl especificado en stl_file
+	#Cara la geometria a partir del archivo de entrada stl especificado en stl_file
 	def __init__(self, stl_file):
 		self.stl_file = stl_file
+		self.minimum = Vector()
+		self.maximum = Vector()
+		self.dimensions = Vector()
 		
 		f = open(stl_file, "r")
 		stream = BinaryStream(f)
@@ -155,11 +165,13 @@ class STL_Object:
 				y = stream.readFloat()
 				z = stream.readFloat()
 				cara.vertices[j].set(x, y, z)
+				#print "   vertice leido: "+cara.vertices[j].to_string()
 			cara.atributos = stream.readUInt16()
 			self.caras.append(cara)
 		f.close()
+		self.calc_dimensions()
 	
-	#guarda la geometría en el archivo salida stl entregado en out_stl_file
+	#guarda la geometria en el archivo salida stl entregado en out_stl_file
 	def export_to_binary_file(self, out_stl_file):
 		f = open(out_stl_file, "w")
 		stream = BinaryStream(f)
@@ -176,10 +188,26 @@ class STL_Object:
 			stream.writeUInt16(self.caras[i].atributos)
 		f.close()
 		
-	#especifica el eje vertical en old_axis. Este será el nuevo eje Z.
+	#especifica el eje vertical en old_axis. Este sera el nuevo eje Z.
 	def make_new_z_axis(self, old_axis):
+		#mucho de este codigo se puede refactorizar
 		if old_axis=='x' or old_axis=='X':
 			#x->z, z->y, y->x
+			aux_x = self.dimensions.x
+			self.dimensions.x = self.dimensions.y
+			self.dimensions.y = self.dimensions.z
+			self.dimensions.z = aux_x
+			
+			aux_x = self.minimum.x
+			self.minimum.x = self.minimum.y
+			self.minimum.y = self.minimum.z
+			self.minimum.z = aux_x
+			
+			aux_x = self.maximum.x
+			self.maximum.x = self.maximum.y
+			self.maximum.y = self.maximum.z
+			self.maximum.z = aux_x
+			
 			for i in range(0, self.n_caras):
 				for j in range(0, 3):
 					aux_x = self.caras[i].vertices[j].x
@@ -188,6 +216,21 @@ class STL_Object:
 					self.caras[i].vertices[j].z = aux_x
 		elif old_axis=='y' or old_axis=='Y':
 			#y->z, z->x, x->y
+			aux_y = self.dimensions.y
+			self.dimensions.y = self.dimensions.x
+			self.dimensions.x = self.dimensions.z
+			self.dimensions.z = aux_y
+			
+			aux_y = self.minimum.y
+			self.minimum.y = self.minimum.x
+			self.minimum.x = self.minimum.z
+			self.minimum.z = aux_y
+			
+			aux_y = self.maximum.y
+			self.maximum.y = self.maximum.x
+			self.maximum.x = self.maximum.z
+			self.maximum.z = aux_y
+			
 			for i in range(0, self.n_caras):
 				for j in range(0, 3):
 					aux_y = self.caras[i].vertices[j].y
@@ -197,28 +240,32 @@ class STL_Object:
 		elif old_axis=='z' or old_axis=='Z':
 			return
 	
+	def calc_dimensions(self):
+		self.minimum.copy_values(self.caras[0].vertices[0])
+		self.maximum.copy_values(self.caras[0].vertices[0])
+		for i in range(0, self.n_caras):
+			for j in range(0, 3):
+				if self.caras[i].vertices[j].x < self.minimum.x:
+					self.minimum.x = self.caras[i].vertices[j].x
+				elif self.caras[i].vertices[j].x > self.maximum.x:
+					self.maximum.x = self.caras[i].vertices[j].x
+				if self.caras[i].vertices[j].y < self.minimum.y:
+					self.minimum.y = self.caras[i].vertices[j].y
+				elif self.caras[i].vertices[j].y > self.maximum.y:
+					self.maximum.y = self.caras[i].vertices[j].y
+				if self.caras[i].vertices[j].z < self.minimum.z:
+					self.minimum.z = self.caras[i].vertices[j].z
+				elif self.caras[i].vertices[j].z > self.maximum.z:
+					self.maximum.z = self.caras[i].vertices[j].z
+		self.dimensions.set(self.maximum.x - self.minimum.x, self.maximum.y - self.minimum.y, self.maximum.z - self.minimum.z)
+		
+	
 	#alinea la geometria con el origen, y retorna la altura (eje z)
 	def align_to_origin(self):
 		if self.n_caras < 1:
 			return 0.0
-		minimum =  self.caras[0].vertices[0]
-		maximum = self.caras[0].vertices[0]
-		for i in range(0, self.n_caras):
-			for j in range(0, 3):
-				if self.caras[i].vertices[j].x < minimum.x:
-					minimum.x = self.caras[i].vertices[j].x
-				elif self.caras[i].vertices[j].x > maximum.x:
-					maximum.x = self.caras[i].vertices[j].x
-				if self.caras[i].vertices[j].y < minimum.y:
-					minimum.y = self.caras[i].vertices[j].y
-				elif self.caras[i].vertices[j].y > maximum.y:
-					maximum.y = self.caras[i].vertices[j].y
-				if self.caras[i].vertices[j].z < minimum.z:
-					minimum.z = self.caras[i].vertices[j].z
-				elif self.caras[i].vertices[j].z > maximum.z:
-					maximum.z = self.caras[i].vertices[j].z
 		center = Vector()
-		center.set(maximum.x+minimum.x, maximum.y+minimum.y,maximum.z+minimum.z)
+		center.set(self.maximum.x+self.minimum.x, self.maximum.y+self.minimum.y,self.maximum.z+self.minimum.z)
 		center.x = float(center.x) / 2.0
 		center.y = float(center.y) / 2.0
 		center.z = float(center.z) / 2.0
@@ -226,21 +273,47 @@ class STL_Object:
 			for j in range(0, 3):
 				self.caras[i].vertices[j].x = self.caras[i].vertices[j].x - center.x
 				self.caras[i].vertices[j].y = self.caras[i].vertices[j].y - center.y
-				self.caras[i].vertices[j].z = self.caras[i].vertices[j].z - minimum.z #este no queda centrado, queda sobre el origen
-		return maximum.z-minimum.z
+				self.caras[i].vertices[j].z = self.caras[i].vertices[j].z - self.minimum.z #este no queda centrado, queda sobre el origen
+		self.minimum.x = self.minimum.x - center.x
+		self.minimum.y = self.minimum.y - center.y
+		self.minimum.z = self.minimum.z - self.minimum.z #este no queda centrado, queda sobre el origen, asi que deberia quedar en cero
+		self.maximum.x = self.maximum.x - center.x
+		self.maximum.y = self.maximum.y - center.y
+		self.maximum.z = self.maximum.z - self.minimum.z #este no queda centrado, queda sobre el origen
+		return self.maximum.z-self.minimum.z #deberia ser igual a dimension[2]
 
+	#devuelve una lista con las dimensiones, en cada eje.
+	def get_dimensions(self):
+		dims = [self.dimensions.x, self.dimensions.y, self.dimensions.z]
+		return dims
+	
+	#devuelve true si el stl cabe en las dimensiones especificadas.
+	def is_smaller(self, dim):
+		if dim[0] > self.dimensions.x :
+			return False
+		elif dim[1] > self.dimensions.y :
+			return False
+		elif dim[2] > self.dimensions.z :
+			return False
+		return True
 
-#def main():
-#	stl_file = ""
-#	if len(sys.argv) < 2:
-#		print "Error numero de argumentos"
-#		return
-#	stl_file = sys.argv[1] #lo saco de la linea de comandos
-#	print "Archivo leido de argumentos: " + stl_file
-#	
-#	stl = STL_Object(stl_file)
-#	stl.make_new_z_axis('x')
-#	altura = stl.align_to_origin()
-#	stl.export_to_binary_file("nuevostl.stl")
-#	
-#main()
+def main():
+	stl_file = ""
+	if len(sys.argv) < 2:
+		print "Error numero de argumentos"
+		return
+	stl_file = sys.argv[1] #lo saco de la linea de comandos
+	print "Archivo leido de argumentos: " + stl_file
+	
+	stl = STL_Object(stl_file)
+	dimensions = stl.get_dimensions()
+	print "dimensiones leidas: ["+str(dimensions[0])+ ", "+ str(dimensions[1])+", "+str(dimensions[2])+"]"
+	
+	stl.make_new_z_axis('x')
+	altura = stl.align_to_origin()
+	dimensions = stl.get_dimensions()
+	print "dimensiones luego de rotacion(x): ["+str(dimensions[0])+ ", "+ str(dimensions[1])+", "+str(dimensions[2])+"]"
+	stl.export_to_binary_file("nuevostl.stl")
+	
+main()
+

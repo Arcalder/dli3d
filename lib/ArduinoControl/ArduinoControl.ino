@@ -9,7 +9,7 @@ Servo myservo;
 int pos = 0;
 int SPEED = 50;
 int STEP = 5;
-int MAXPOS = 180;
+int MAXPOS = 90;
 String inString = "";
 String steps= "";
 
