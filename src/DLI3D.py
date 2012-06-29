@@ -60,7 +60,7 @@ class Application(QtGui.QWidget):
         self.outputButton = QtGui.QPushButton('Select Folder')
         self.outputButton.clicked.connect(self.showOpenFileOutput)
          
-        self.openSTLButton = QtGui.QPushButton('Open STL to create the slices')
+        self.openSTLButton = QtGui.QPushButton('Open STL to create the slices: must be a valid STL, check "restriction.jpg"')
         self.openSTLButton.clicked.connect(self.showOpenFile)
         self.openSTLButton.setEnabled(False)
         
