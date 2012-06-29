@@ -31,3 +31,10 @@ Instalar Eclipse:
 
 Instalar Aptana3 
 - http://aptana.com/products/studio3/download
+
+---STLs Validos---
+Para generar slices del tamanio deseado se deben cumplir ciertas restricciones:
+- El STL debe estar orientado segun el eje Z.
+- El STL debe estar centrado en el origen (0,0,0)
+- El STL debe estar centrado tambien en un rectangulo de 100mm de largo y 75mm de ancho.
+- Este rectangulo debe tener discos en el plano xy en sus esquinas. (revisar imagen restriccion.jpg)
