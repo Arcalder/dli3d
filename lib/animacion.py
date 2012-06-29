@@ -5,9 +5,6 @@ from PyQt4.QtGui import QWidget, QPainter, QApplication
 import PIL
 from PIL import Image
 
-
-
-
 def is_image(filename):
     """ File is image if it has a common suffix and it is a regular file """
 
@@ -22,27 +19,37 @@ def is_image(filename):
 
 def load_file_list(folder):
     """ Find all images """
+    if folder[:-1]!="/":
+        folder = folder + "/"
     files = []
     images = []
     index = 0
     for filename in os.listdir(folder):
         files.append(folder+filename)
+        #print filename
     return files
 
-class Display_images(QtGui.QWidget):
+class Display_images(QWidget):#QWidget):
  
     
     __pyqtSignals__ = ("timeChanged(QTime)", "timeZoneChanged(int)")
     
-    def __init__(self, folder ='./imagenes/'):
+    def __init__(self, folder ='./animacion/', parent = None, seconds = 1):
     
-        QtGui.QWidget.__init__(self, None)
-        pDesktop = QApplication.desktop ();
+        #QtGui.QWidget.__init__(self, parent)
+        #QtGui.QDialog.__init__(self, parent)
+        QWidget.__init__(self)
+        pDesktop = QApplication.desktop ()
 
         self.folder = folder
+        self.time_to_change = int(seconds*1000)
+        self.black_time = 1000 
+
+        print "t = ",self.time_to_change, " tb = ", self.black_time
         self.timeZoneOffset = 0
 
         self.i = 0
+        self.num_imagen = 0
         self.para_blanco = 0
         self.time = QtCore.QTime.currentTime()
         
@@ -51,14 +58,14 @@ class Display_images(QtGui.QWidget):
         self.connect(timer, QtCore.SIGNAL("timeout()"), self.updateTime)
         timer.start(1)
 
-        self.imagenes = load_file_list(folder)
+        self.imagenes = load_file_list(self.folder)
         
         self.label =  QtGui.QLabel(self)
-        self.label.setPixmap(QtGui.QPixmap("black.jpg"))
+        self.label.setStyleSheet("QLabel { background-color : black;}");
         self.label.setScaledContents(True)
         
         self.setWindowTitle(QtCore.QObject.tr(self, "DLI3D"))
-        self.resize(600, 600)
+        self.resize(800, 600)
         
         grid = QtGui.QGridLayout()
         grid.setSpacing(10)
@@ -84,30 +91,26 @@ class Display_images(QtGui.QWidget):
         #time = time.addMSecs(self.timeZoneOffset * 3600000)
         #now = time.second()
 
-        if anterior + 1000 < ahora and self.i < len(self.imagenes):
+        #print "ahora = ", ahora, "anterior = ", anterior
 
-            self.para_blanco += 1
+        if self.para_blanco%2 == 1:
+            #print "para blanco: ", self.para_blanco
+            if (anterior + self.black_time < ahora ) and (self.num_imagen < len(self.imagenes)):
+                #print "cambia: ", self.imagenes[self.num_imagen]                
+                self.label.setPixmap(QtGui.QPixmap(self.imagenes[self.num_imagen]))
+                self.num_imagen += 1
+                self.para_blanco += 1
+                self.time = time
+        else:
+            #print "para blanco: ", self.para_blanco
+            if (anterior + self.time_to_change  < ahora ):   
+                #print "borrar"
+                self.label.clear()
+                self.para_blanco += 1
+                self.time = time
 
-            if self.para_blanco%2 == 1:
-                self.label.setPixmap(QtGui.QPixmap("white.jpg"))
-            else:
-                self.i += 1
-                archivo = self.imagenes[self.i]
-                self.label.setPixmap(QtGui.QPixmap(archivo))
-
-            print self.time
-            print time
-            print "----"
-
-                       
-
-            self.time = time
-            
-
-
-        #painter.rotate(30.0 * ((time.hour() + time.minute() / 60.0)))
-
-        #painter.rotate(6.0 * (time.minute() + time.second() / 60.0))
+        if self.num_imagen >= len(self.imagenes):
+            self.label.clear()
 
     
     def minimumSizeHint(self):
