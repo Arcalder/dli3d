@@ -92,7 +92,7 @@ class TestArduinoMotorControl(unittest.TestCase):
 		#assert
 		self.assertTrue(arduino is not None)
 		mock_arduino_motor_control_class.write.assert_called_with('o')
-		
+
 	@patch('serial.Serial')
 	def testOpenCloseValve(self, mock_arduino_motor_control_class):
 		#arrange
