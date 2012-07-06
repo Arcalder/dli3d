@@ -110,7 +110,7 @@ class Display_images(QWidget):#QWidget):
         if self.para_blanco%2 == 1:
             #print "para blanco: ", self.para_blanco
             if (anterior + self.black_time < ahora ) and (self.num_imagen < len(self.imagenes)):
-                print 'se cambia imagen'
+                #print 'se cambia imagen'
                 #print "cambia: ", self.imagenes[self.num_imagen]
                 self.label.setPixmap(QtGui.QPixmap(self.imagenes[self.num_imagen]))
                 self.para_blanco += 1
