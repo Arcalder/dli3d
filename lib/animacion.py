@@ -12,7 +12,7 @@
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
-# Foobar is distributed in the hope that it will be useful,
+# 'DLI3D' is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
@@ -102,7 +102,7 @@ class Display_images(QWidget):#QWidget):
         self.resize(800, 600)
 
         grid = QtGui.QGridLayout()
-        grid.setSpacing(10)
+        grid.setContentsMargins(0,0,0,0)
         grid.addWidget(self.label, 1,0)
 
         self.setLayout(grid)
